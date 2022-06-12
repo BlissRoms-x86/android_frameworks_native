@@ -929,6 +929,8 @@ bool Layer::setBackgroundColor(const half3& color, float alpha, ui::Dataspace da
 }
 
 bool Layer::setCornerRadius(float cornerRadius) {
+    if (android::base::GetBoolProperty("ro.config.low_ram", false)) {
+    cornerRadius = 0;}
     if (mDrawingState.cornerRadius == cornerRadius) return false;
 
     mDrawingState.sequence++;
@@ -939,6 +941,8 @@ bool Layer::setCornerRadius(float cornerRadius) {
 }
 
 bool Layer::setBackgroundBlurRadius(int backgroundBlurRadius) {
+    if (android::base::GetBoolProperty("ro.config.low_ram", false)) {
+    backgroundBlurRadius = 0;}
     if (mDrawingState.backgroundBlurRadius == backgroundBlurRadius) return false;
     // If we start or stop drawing blur then the layer's visibility state may change so increment
     // the magic sequence number.
