@@ -1222,6 +1222,8 @@ bool Layer::setBackgroundColor(const half3& color, float alpha, ui::Dataspace da
 }
 
 bool Layer::setCornerRadius(float cornerRadius) {
+    if (property_get_bool("ro.config.low_ram", false)) {
+    cornerRadius = 0;}
     if (mCurrentState.cornerRadius == cornerRadius) return false;
 
     mCurrentState.sequence++;
@@ -1232,6 +1234,8 @@ bool Layer::setCornerRadius(float cornerRadius) {
 }
 
 bool Layer::setBackgroundBlurRadius(int backgroundBlurRadius) {
+    if (property_get_bool("ro.config.low_ram", false)) {
+    backgroundBlurRadius = 0;}
     if (mCurrentState.backgroundBlurRadius == backgroundBlurRadius) return false;
 
     mCurrentState.sequence++;
