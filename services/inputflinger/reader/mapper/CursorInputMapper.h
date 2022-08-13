@@ -51,6 +51,43 @@ private:
     void clearRelativeAxes();
 };
 
+/* Keeps track of cursor movements. */
+class CursorPositionAccumulator {
+public:
+    CursorPositionAccumulator();
+    void configure(InputMapper* im, InputDeviceContext& deviceContext);
+    void reset(InputDeviceContext& deviceContext);
+
+    void process(const RawEvent* rawEvent);
+    void finishSync();
+
+    inline int32_t getX() const { return mX; }
+    inline int32_t getY() const { return mY; }
+    inline int32_t getDeltaX() const { return mDeltaX; }
+    inline int32_t getDeltaY() const { return mDeltaY; }
+    inline int32_t getSpanAbsX() const { return 1 + (mMaxAbsX - mMinAbsX); }
+    inline int32_t getSpanAbsY() const { return 1 + (mMaxAbsY - mMinAbsY); }
+    inline bool isSupported() const { return hasAbsX() && mMaxAbsX && hasAbsY() && mMaxAbsY; }
+    inline bool hasMoved() const { return isSupported() && mMoved; }
+    inline bool hasAbsX() const { return mHasAbsX; }
+    inline bool hasAbsY() const { return mHasAbsY; }
+
+private:
+    int32_t mX;
+    int32_t mY;
+    int32_t mDeltaX;
+    int32_t mDeltaY;
+    int32_t mMinAbsX;
+    int32_t mMinAbsY;
+    int32_t mMaxAbsX;
+    int32_t mMaxAbsY;
+    bool mHasAbsX;
+    bool mHasAbsY;
+    bool mMoved;
+
+    void clearPos();
+};
+
 class CursorInputMapper : public InputMapper {
 public:
     explicit CursorInputMapper(InputDeviceContext& deviceContext);
@@ -87,6 +124,7 @@ private:
 
     CursorButtonAccumulator mCursorButtonAccumulator;
     CursorMotionAccumulator mCursorMotionAccumulator;
+    CursorPositionAccumulator mCursorPositionAccumulator;
     CursorScrollAccumulator mCursorScrollAccumulator;
 
     int32_t mSource;
@@ -116,6 +154,7 @@ private:
     void configureParameters();
     void dumpParameters(std::string& dump);
 
+    void rotateAbsolute(int32_t orientation, float* absX, float* absY);
     void sync(nsecs_t when, nsecs_t readTime);
 };
 
