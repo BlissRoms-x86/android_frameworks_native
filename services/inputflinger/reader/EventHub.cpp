@@ -165,6 +165,13 @@ uint32_t getAbsAxisUsage(int32_t axis, uint32_t deviceClasses) {
             case ABS_MT_PRESSURE:
             case ABS_MT_DISTANCE:
                 return INPUT_DEVICE_CLASS_TOUCH;
+
+    // Absolute mouse support
+    if (deviceClasses & INPUT_DEVICE_CLASS_CURSOR)) {
+        switch (axis) {
+            case ABS_X:
+            case ABS_Y:
+                return INPUT_DEVICE_CLASS_CURSOR;
         }
     }
 
@@ -1354,8 +1361,9 @@ status_t EventHub::openDeviceLocked(const char *devicePath, bool ignoreAlreadyOp
     }
 
     // See if this is a cursor device such as a trackball or mouse.
-    if (test_bit(BTN_MOUSE, device->keyBitmask) && test_bit(REL_X, device->relBitmask) &&
-        test_bit(REL_Y, device->relBitmask)) {
+    if (test_bit(BTN_MOUSE, device->keyBitmask) && ((test_bit(REL_X, device->relBitmask) &&
+        test_bit(REL_Y, device->relBitmask)) || (test_bit(ABS_X, device->relBitmask) &&
+        test_bit(ABS_Y, device->relBitmask) && test_bit(REL_WHEEL, device->relBitmask)))) {
         device->classes |= INPUT_DEVICE_CLASS_CURSOR;
     }
 
@@ -1380,7 +1388,7 @@ status_t EventHub::openDeviceLocked(const char *devicePath, bool ignoreAlreadyOp
         }
         // Is this an old style single-touch driver?
     } else if ((test_bit(BTN_TOUCH, device->keyBitmask) || test_bit(BTN_LEFT, device->keyBitmask)) && test_bit(ABS_X, device->absBitmask) &&
-               test_bit(ABS_Y, device->absBitmask)) {
+               test_bit(ABS_Y, device->absBitmask) && !test_bit(REL_WHEEL, device->relBitmask)) {
         device->classes |= INPUT_DEVICE_CLASS_TOUCH;
         // Is this a BT stylus?
     } else if ((test_bit(ABS_PRESSURE, device->absBitmask) ||
