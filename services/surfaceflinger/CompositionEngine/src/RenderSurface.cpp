@@ -86,9 +86,9 @@ void RenderSurface::initialize() {
     int status = native_window_api_connect(window, NATIVE_WINDOW_API_EGL);
     ALOGE_IF(status != NO_ERROR, "Unable to connect BQ producer: %d", status);
 
-    if (property_get("ro.hardware.egl", value, NULL) > 0){
-        ALOGI("Use BGRA_8888 as surface format when EGL is \"%s\"", value);
-        if (!strcmp("swiftshader", value)) {
+    if (property_get("ro.graphics.colors_swap", value, NULL) > 0){
+        ALOGI("Swap to BGRA_8888 is \"%s\"", value);
+        if (strcmp("true", value)) {
             format = HAL_PIXEL_FORMAT_BGRA_8888;
         }
     }
