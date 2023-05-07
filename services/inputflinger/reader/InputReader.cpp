@@ -845,6 +845,7 @@ void InputReader::dump(std::string& dump) {
                          mConfig.wheelVelocityControlParameters.highThreshold,
                          mConfig.wheelVelocityControlParameters.acceleration);
 
+    dump += StringPrintf(INDENT2 "PointerTouchEmulation: %s\n", toString(mConfig.forceMouseAsTouch));
     dump += StringPrintf(INDENT2 "PointerGesture:\n");
     dump += StringPrintf(INDENT3 "Enabled: %s\n", toString(mConfig.pointerGesturesEnabled));
     dump += StringPrintf(INDENT3 "QuietInterval: %0.1fms\n",
