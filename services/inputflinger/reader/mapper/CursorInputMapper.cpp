@@ -249,6 +249,17 @@ void CursorInputMapper::configure(nsecs_t when, const InputReaderConfiguration* 
         mWheelYVelocityControl.setParameters(config->wheelVelocityControlParameters);
     }
 
+    if (!changes || (changes & InputReaderConfiguration::CHANGE_FORCE_MOUSE_AS_TOUCH)) {
+        if (mParameters.mode == Parameters::MODE_POINTER_RELATIVE) {
+            // Disable touch emulation for the pointer when Pointer Capture is enabled.
+            mSource = AINPUT_SOURCE_MOUSE_RELATIVE;
+        } else if (config->forceMouseAsTouch) {
+            mSource = AINPUT_SOURCE_TOUCHSCREEN;
+        } else {
+            mSource = AINPUT_SOURCE_MOUSE;
+        }
+    }
+
     if (!changes || (changes & InputReaderConfiguration::CHANGE_DISPLAY_INFO)) {
         mOrientation = DISPLAY_ORIENTATION_0;
         mDisplayWidth = 0;
@@ -452,7 +463,7 @@ void CursorInputMapper::sync(nsecs_t when, nsecs_t readTime) {
     int32_t displayId = ADISPLAY_ID_NONE;
     float xCursorPosition = AMOTION_EVENT_INVALID_CURSOR_POSITION;
     float yCursorPosition = AMOTION_EVENT_INVALID_CURSOR_POSITION;
-    if (mSource == AINPUT_SOURCE_MOUSE) {
+    if (mSource == AINPUT_SOURCE_MOUSE || mSource == AINPUT_SOURCE_TOUCHSCREEN) {
         if (moved || movedAbs || scrolled || buttonsChanged) {
             mPointerController->setPresentation(PointerControllerInterface::Presentation::POINTER);
 
@@ -530,7 +541,7 @@ void CursorInputMapper::sync(nsecs_t when, nsecs_t readTime) {
         int32_t motionEventAction;
         if (downChanged) {
             motionEventAction = down ? AMOTION_EVENT_ACTION_DOWN : AMOTION_EVENT_ACTION_UP;
-        } else if (down || (mSource != AINPUT_SOURCE_MOUSE)) {
+        } else if (down || (mSource != AINPUT_SOURCE_MOUSE && mSource != AINPUT_SOURCE_TOUCHSCREEN)) {
             motionEventAction = AMOTION_EVENT_ACTION_MOVE;
         } else {
             motionEventAction = AMOTION_EVENT_ACTION_HOVER_MOVE;
@@ -581,7 +592,7 @@ void CursorInputMapper::sync(nsecs_t when, nsecs_t readTime) {
         ALOG_ASSERT(buttonState == currentButtonState);
 
         // Send hover move after UP to tell the application that the mouse is hovering now.
-        if (motionEventAction == AMOTION_EVENT_ACTION_UP && (mSource == AINPUT_SOURCE_MOUSE)) {
+        if (motionEventAction == AMOTION_EVENT_ACTION_UP && (mSource == AINPUT_SOURCE_MOUSE || mSource == AINPUT_SOURCE_TOUCHSCREEN)) {
             NotifyMotionArgs hoverArgs(getContext()->getNextId(), when, readTime, getDeviceId(),
                                        mSource, displayId, policyFlags,
                                        AMOTION_EVENT_ACTION_HOVER_MOVE, 0, 0, metaState,

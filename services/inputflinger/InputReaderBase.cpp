@@ -55,6 +55,9 @@ std::string InputReaderConfiguration::changesToString(uint32_t changes) {
     if (changes & CHANGE_SHOW_TOUCHES) {
         result += "SHOW_TOUCHES | ";
     }
+    if (changes & CHANGE_FORCE_MOUSE_AS_TOUCH) {
+        result += "FORCE_MOUSE_AS_TOUCH | ";
+    }
     if (changes & CHANGE_KEYBOARD_LAYOUTS) {
         result += "KEYBOARD_LAYOUTS | ";
     }
