@@ -249,9 +249,8 @@ void CursorInputMapper::configure(nsecs_t when, const InputReaderConfiguration* 
         mWheelYVelocityControl.setParameters(config->wheelVelocityControlParameters);
     }
 
-    if (!changes || (changes & InputReaderConfiguration::CHANGE_FORCE_MOUSE_AS_TOUCH) ||
-        configurePointerCapture) {
-        if (mParameters.mode == Parameters::Mode::POINTER_RELATIVE) {
+    if (!changes || (changes & InputReaderConfiguration::CHANGE_FORCE_MOUSE_AS_TOUCH)) {
+        if (mParameters.mode == Parameters::MODE_POINTER_RELATIVE) {
             // Disable touch emulation for the pointer when Pointer Capture is enabled.
             mSource = AINPUT_SOURCE_MOUSE_RELATIVE;
         } else if (config->forceMouseAsTouch) {
@@ -293,8 +292,10 @@ void CursorInputMapper::configure(nsecs_t when, const InputReaderConfiguration* 
             }
         }
 
-        if (mDisplayId && mCursorPositionAccumulator.isSupported()) {
-            if (auto viewport = config->getDisplayViewportById(*mDisplayId); viewport) {
+        if (mCursorPositionAccumulator.isSupported()) {
+            std::optional<DisplayViewport> viewport =
+                    config->getDisplayViewportByType(ViewportType::INTERNAL);
+            if (viewport) {
                 mXScale = float(viewport->physicalRight - viewport->physicalLeft) / mCursorPositionAccumulator.getSpanAbsX();
                 mYScale = float(viewport->physicalBottom - viewport->physicalTop) / mCursorPositionAccumulator.getSpanAbsY();
                 mXPrecision = 1.0f / mXScale;
