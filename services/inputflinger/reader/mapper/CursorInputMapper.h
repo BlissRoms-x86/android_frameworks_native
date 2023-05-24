@@ -132,6 +132,10 @@ private:
     float mYScale;
     float mXPrecision;
     float mYPrecision;
+    float mAbsXScale;
+    float mAbsYScale;
+    float mAbsXPrecision;
+    float mAbsYPrecision;
 
     float mVWheelScale;
     float mHWheelScale;
