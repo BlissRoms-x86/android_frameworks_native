@@ -33,6 +33,8 @@ cc_defaults {
         "-Wshadow",
         "-Wshadow-field-in-constructor-modified",
         "-Wshadow-uncaptured-local",
+        "-DCONSOLE_MANAGER",
+        "-DANDROID_VT=7",
     ],
     sanitize: {
         misc_undefined: ["bounds"],
@@ -87,8 +89,6 @@ cc_library_shared {
         "libinputflinger_defaults",
     ],
     cflags: [
-        "-DCONSOLE_MANAGER",
-        "-DANDROID_VT=7",
         // TODO(b/23084678): Move inputflinger to its own process and mark it hidden
         //-fvisibility=hidden
     ],
